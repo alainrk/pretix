@@ -44,6 +44,13 @@ class ItemCategory(LoggedModel):
     position = models.IntegerField(
         default=0
     )
+    is_addon = models.BooleanField(
+        default=False,
+        verbose_name=_('Products in this category are add-on products'),
+        help_text=_('If selected, the products belonging to this category are not for sale on their own. They can '
+                    'only be bought in combination with a product that has this category configured as a possible '
+                    'source for add-ons.')
+    )
 
     class Meta:
         verbose_name = _("Product category")
@@ -51,6 +58,8 @@ class ItemCategory(LoggedModel):
         ordering = ('position', 'id')
 
     def __str__(self):
+        if self.is_addon:
+            return _('{category} (Add-On products)').format(category=str(self.name))
         return str(self.name)
 
     def delete(self, *args, **kwargs):
@@ -367,6 +376,27 @@ class ItemVariation(models.Model):
         if self.position == other.position:
             return self.id < other.id
         return self.position < other.position
+
+
+class ItemAddOn(models.Model):
+    """
+    An isntance of this model indicates that buying a ticket of the time ``base_item``
+    allows you to add up to ``max_count`` items from the category ``addon_category``
+    to your order that will be associated with the base item.
+    """
+    base_item = models.ForeignKey(
+        Item,
+        related_name='addons'
+    )
+    addon_category = models.ForeignKey(
+        ItemCategory,
+        related_name='addons',
+        verbose_name=_('Category')
+    )
+    max_count = models.PositiveIntegerField(
+        default=1,
+        verbose_name=_('Maximum amount')
+    )
 
 
 class Question(LoggedModel):
