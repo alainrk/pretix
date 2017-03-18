@@ -380,7 +380,7 @@ class ItemVariation(models.Model):
 
 class ItemAddOn(models.Model):
     """
-    An isntance of this model indicates that buying a ticket of the time ``base_item``
+    An instance of this model indicates that buying a ticket of the time ``base_item``
     allows you to add up to ``max_count`` items from the category ``addon_category``
     to your order that will be associated with the base item.
     """
@@ -390,12 +390,16 @@ class ItemAddOn(models.Model):
     )
     addon_category = models.ForeignKey(
         ItemCategory,
-        related_name='addons',
+        related_name='addon_to',
         verbose_name=_('Category')
+    )
+    min_count = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_('Minimum number')
     )
     max_count = models.PositiveIntegerField(
         default=1,
-        verbose_name=_('Maximum amount')
+        verbose_name=_('Maximum number')
     )
 
 
