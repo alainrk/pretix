@@ -11,6 +11,7 @@ from pretix.base.forms import I18nFormSet, I18nModelForm
 from pretix.base.models import (
     Item, ItemCategory, ItemVariation, Question, QuestionOption, Quota,
 )
+from pretix.base.models.items import ItemAddOn
 
 
 class CategoryForm(I18nModelForm):
@@ -19,7 +20,8 @@ class CategoryForm(I18nModelForm):
         localized_fields = '__all__'
         fields = [
             'name',
-            'description'
+            'description',
+            'is_addon'
         ]
 
 
@@ -206,4 +208,42 @@ class ItemVariationForm(I18nModelForm):
             'value',
             'active',
             'default_price',
+        ]
+
+
+class ItemAddOnsFormSet(I18nFormSet):
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.get('event')
+        super().__init__(*args, **kwargs)
+
+    def _construct_form(self, i, **kwargs):
+        kwargs['event'] = self.event
+        return super()._construct_form(i, **kwargs)
+
+    @property
+    def empty_form(self):
+        form = self.form(
+            auto_id=self.auto_id,
+            prefix=self.add_prefix('__prefix__'),
+            empty_permitted=True,
+            locales=self.locales,
+            event=self.event
+        )
+        self.add_fields(form, None)
+        return form
+
+
+class ItemAddOnForm(I18nModelForm):
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super().__init__(*args, **kwargs)
+        self.fields['addon_category'].queryset = self.event.categories.all()
+
+    class Meta:
+        model = ItemAddOn
+        localized_fields = '__all__'
+        fields = [
+            'addon_category',
+            'min_count',
+            'max_count',
         ]

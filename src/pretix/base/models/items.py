@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import Tuple
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Func, Q, Sum
 from django.utils.functional import cached_property
@@ -401,6 +402,10 @@ class ItemAddOn(models.Model):
         default=1,
         verbose_name=_('Maximum number')
     )
+
+    def clean(self):
+        if self.max_count < self.min_count:
+            raise ValidationError(_('The minimum number needs to be lower than the maximum number.'))
 
 
 class Question(LoggedModel):
