@@ -140,6 +140,14 @@ class AddOnsStep(CartMixin, AsyncAction, TemplateFlowStep):
         return get_cart(request).filter(item__addons__isnull=False).exists()
 
     def is_completed(self, request, warn=False):
+        for cartpos in get_cart(request).filter(addon_to__isnull=True).prefetch_related(
+            'item__addons', 'item__addons__addon_category', 'addons', 'addons__item'
+        ):
+            a = cartpos.addons.all()
+            for iao in cartpos.item.addons.all():
+                found = len([1 for p in a if p.item.category_id == iao.addon_category_id])
+                if found < iao.min_count or found > iao.max_count:
+                    return False
         return True
 
     @cached_property
