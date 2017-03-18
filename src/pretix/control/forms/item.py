@@ -220,8 +220,25 @@ class ItemAddOnsFormSet(I18nFormSet):
         kwargs['event'] = self.event
         return super()._construct_form(i, **kwargs)
 
+    def clean(self):
+        super().clean()
+        categories = set()
+        for i in range(0, self.total_form_count()):
+            form = self.forms[i]
+            if self.can_delete:
+                if self._should_delete_form(form):
+                    # This form is going to be deleted so any of its errors
+                    # should not cause the entire formset to be invalid.
+                    continue
+
+            if form.cleaned_data['addon_category'] in categories:
+                raise ValidationError(_('You added the same add-on category twice'))
+
+            categories.add(form.cleaned_data['addon_category'])
+
     @property
     def empty_form(self):
+        self.is_valid()
         form = self.form(
             auto_id=self.auto_id,
             prefix=self.add_prefix('__prefix__'),

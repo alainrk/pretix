@@ -422,7 +422,7 @@ class AbstractPosition(models.Model):
         'Voucher', null=True, blank=True
     )
     addon_to = models.ForeignKey(
-        'self', null=True, blank=True, on_delete=models.CASCADE
+        'self', null=True, blank=True, on_delete=models.CASCADE, related_name='addons'
     )
 
     class Meta:
