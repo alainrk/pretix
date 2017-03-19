@@ -466,7 +466,7 @@ class CartManager:
                             event=self.event, item=op.item, variation=op.variation,
                             price=op.price, expires=self._expiry,
                             cart_id=self.cart_id, voucher=op.voucher,
-                            addon_to=op.addon_to
+                            addon_to=op.addon_to if op.addon_to else None
                         ))
                 elif isinstance(op, self.ExtendOperation):
                     if available_count == 1:
