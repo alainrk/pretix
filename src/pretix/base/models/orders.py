@@ -490,7 +490,8 @@ class OrderPosition(AbstractPosition):
 
         ops = []
         cp_mapping = {}
-        for i, cartpos in enumerate(sorted(cp, key=lambda c: (c.pk, c.addon_to_id))):
+        # The sorting key ensures that all addons come directly after the position they refer to
+        for i, cartpos in enumerate(sorted(cp, key=lambda c: (c.addon_to_id or c.pk, c.addon_to_id or 0))):
             op = OrderPosition(order=order)
             for f in AbstractPosition._meta.fields:
                 if f.name == 'addon_to':
