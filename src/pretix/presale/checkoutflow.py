@@ -158,6 +158,8 @@ class AddOnsStep(CartMixin, AsyncAction, TemplateFlowStep):
         submitted at once.
         """
         formset = []
+        quota_cache = {}
+        item_cache = {}
         for cartpos in get_cart(self.request).filter(addon_to__isnull=True).prefetch_related(
             'item__addons', 'item__addons__addon_category', 'addons', 'addons__variation'
         ):
@@ -180,7 +182,9 @@ class AddOnsStep(CartMixin, AsyncAction, TemplateFlowStep):
                         prefix='{}_{}'.format(cartpos.pk, iao.addon_category.pk),
                         category=iao.addon_category,
                         initial=current_addon_products,
-                        data=(self.request.POST if self.request.method == 'POST' else None)
+                        data=(self.request.POST if self.request.method == 'POST' else None),
+                        quota_cache=quota_cache,
+                        item_cache=item_cache
                     )
                 }
 
