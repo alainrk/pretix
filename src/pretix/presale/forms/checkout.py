@@ -56,8 +56,8 @@ class QuestionsForm(forms.Form):
         :param cartpos: The cart position the form should be for
         :param event: The event this belongs to
         """
-        cartpos = kwargs.pop('cartpos', None)
-        orderpos = kwargs.pop('orderpos', None)
+        cartpos = self.cartpos = kwargs.pop('cartpos', None)
+        orderpos = self.orderpos = kwargs.pop('orderpos', None)
         item = cartpos.item if cartpos else orderpos.item
         questions = list(item.questions.all())
         event = kwargs.pop('event')

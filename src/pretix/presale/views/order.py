@@ -392,9 +392,7 @@ class OrderModify(EventViewMixin, OrderDetailMixin, QuestionsViewMixin, Template
 
     @cached_property
     def positions(self):
-        return list(self.order.positions.order_by(
-            'item', 'variation'
-        ).select_related(
+        return list(self.order.positions.select_related(
             'item', 'variation'
         ).prefetch_related(
             'variation', 'item__questions', 'answers'
@@ -445,7 +443,7 @@ class OrderModify(EventViewMixin, OrderDetailMixin, QuestionsViewMixin, Template
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['order'] = self.order
-        ctx['forms'] = self.forms
+        ctx['formgroups'] = self.formdict.items()
         ctx['invoice_form'] = self.invoice_form
         return ctx
 
