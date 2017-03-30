@@ -51,6 +51,7 @@ error_messages = {
     'addon_max_count': _('You can select at most %(max)s add-ons from the category %(cat)s for the product %(base)s.'),
     'addon_min_count': _('You need to select at least %(min)s add-ons from the category %(cat)s for the '
                          'product %(base)s.'),
+    'addon_only': _('One of the products you selected can only be bought as an add-on to another project.'),
 }
 
 
@@ -146,6 +147,9 @@ class CartManager:
                 raise CartError(error_messages['voucher_invalid_item'])
 
         if isinstance(op, self.AddOperation):
+            if op.item.category.is_addon and not op.addon_to:
+                raise CartError(error_messages['addon_only'])
+
             if op.item.max_per_order:
                 new_total = (
                     len([1 for p in self.positions if p.item_id == op.item.pk]) +
